@@ -1,4 +1,3 @@
-import { email } from "zod";
 import { Prisma } from "../../generated/prisma/browser";
 import { prisma } from "../lib/prisma"
 import { User } from "../types/userTypes";

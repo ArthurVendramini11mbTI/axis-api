@@ -22,7 +22,7 @@ mainRouter.post('/createUser', async (req, res) => {
     }
 });
 
-mainRouter.get('/userLogin', async (req, res) => {
+mainRouter.post('/userLogin', async (req, res) => {
     const UserData: User = req.body
 
     if(!UserData){
