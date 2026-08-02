@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { createUser, deleteUser, userLogin, listUsers, updateUserPassword } from '../../services/user';
 import { User } from '../../types/userTypes';
+import { createAccessToken, validateAcessToken } from '../../services/tokens';
 
 export const userRouter = Router();
 
@@ -22,16 +23,35 @@ userRouter.post('/createUser', async (req, res) => {
 userRouter.post('/userLogin', async (req, res) => {
     const UserData: User = req.body
 
-    if(!UserData){
-        return res.json({message : 'sem informações'})
+    if(!UserData?.email || !UserData?.password){
+        return res.status(400).json({message : 'sem informações'})
     }
     
     const validation = await userLogin(UserData)
     
     if(validation == true){
-        return res.json({message : 'Login realizado com sucesso'})
+        const token = createAccessToken(UserData.email)
+
+        return res.json({message : 'Login realizado com sucesso', token: token})
     }
-        return res.json({message : 'ACESSO NEGADO'})
+        return res.status(401).json({message : 'ACESSO NEGADO'})
+})
+
+userRouter.get('/validation', (req, res) => {
+    const authHeader = req.headers.authorization
+    const [scheme, token] = authHeader?.split(' ') ?? []
+
+    if(scheme !== 'Bearer' || !token){
+        return res.status(401).json({error: 'Não autorizado'})
+    }
+
+    const validation = validateAcessToken(token)
+
+    if(!validation){
+        return res.status(401).json({error: 'Não autorizado'})
+    }
+
+    return res.json({message: 'Acesso autorizado'})
 })
 
 userRouter.get('/listUsers', async (req, res) => {

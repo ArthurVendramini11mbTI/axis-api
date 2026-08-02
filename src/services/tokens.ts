@@ -13,19 +13,23 @@ function getRequiredEnv(name: string): string {
 
 const JWT_SECRET = getRequiredEnv('JWT_SECRET')
 
-export function createAccessToken(userData: AuthenticatedUser): string {
+export function createAccessToken(email: string): string {
   return jwt.sign(
     {
-      email: userData.email,
-      role: userData.role,
+      email: email
     },
     JWT_SECRET,
     {
-      subject: String(userData.id),
       expiresIn: "15m",
-      algorithm: "HS256",
-      issuer: "study-app-api",
-      audience: "study-app-web",
     },
   );
+}
+
+export function validateAcessToken(token: string): boolean {
+  try {
+      jwt.verify(token, JWT_SECRET)
+      return true
+    } catch {
+      return false
+    }
 }

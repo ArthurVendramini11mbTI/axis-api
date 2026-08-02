@@ -35,25 +35,22 @@ export const updateUserPassword = async(id: number, password: string) => {
     })
 }
 
-export const userLogin = async (data : User) => {
-    
-     const user = await prisma.user.findUnique({ 
-        where: {
-            email: data.email
-        }
-     })
-     if(!user){
-        return false
-     }
+export const userLogin = async (data: User) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      email: data.email.trim().toLowerCase(),
+    },
+  });
 
-     const passwordMatch = await bcrypt.compare(
-        data.password,
-        user.password 
-    );
+  if (!user) {
+    return false;
+  }
 
-    if (!passwordMatch) {
-        return false;
-    }
+  const passwordMatch = await bcrypt.compare(
+    data.password,
+    user.password
+  );
 
-    return true;
-}
+
+  return passwordMatch;
+};
