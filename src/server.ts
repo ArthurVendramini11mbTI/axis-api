@@ -6,7 +6,11 @@ import helmet from 'helmet';
 
 const server = express();
 server.use(helmet());
-server.use(cors());
+server.use(
+  cors({
+    origin: 'http://localhost:5173',
+  })
+);
 server.use(urlencoded({ extended: true }));
 server.disable('x-powered-by');
 server.use(express.json());
