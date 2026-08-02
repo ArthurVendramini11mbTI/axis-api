@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique @db.VarChar(100)
+  password String @db.VarChar(255)
+  goals    Goal[]
+
+  @@map("users")
+}
+
+model Goal {
+  id              Int     @id @default(autoincrement())
+  goalName        String  @map("goal_name") @db.VarChar(100)
+  goalDescription String? @map("goal_description") @db.Text
+  goalTime        Int?    @map("goal_time")
+  userId          Int     @map("user_id")
+  user            User    @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "goals_user_id_fkey")
+  @@map("goals")
+}
