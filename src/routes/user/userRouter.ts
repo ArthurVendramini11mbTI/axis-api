@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { createUser, deleteUser, userLogin, listUsers, updateUserPassword } from '../../services/user';
+import { createUser, deleteUser, listUsers, updateUserPassword } from '../../services/user';
 import { User } from '../../types/userTypes';
+import { Auth } from '../../middlewares/auth'
 
 export const userRouter = Router();
 
@@ -29,7 +30,7 @@ userRouter.post('/userLogin', async (req, res) => {
     return res.json({message : 'Login realizado com sucesso'})
 })
 
-userRouter.get('/listUsers', async (req, res) => {
+userRouter.get('/listUsers', Auth.private, async (req, res) => {
         const users = await listUsers()
         if(users.length !== 0){
             return res.json({ users })
@@ -38,7 +39,7 @@ userRouter.get('/listUsers', async (req, res) => {
     
 })
 
-userRouter.delete('/deleteUser', async (req, res) => {
+userRouter.delete('/deleteUser', Auth.private, async (req, res) => {
     const userId = req.body.userId
 
         if(isNaN(userId)){
