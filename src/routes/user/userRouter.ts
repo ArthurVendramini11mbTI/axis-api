@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { createUser, deleteUser, listUsers, updateUserPassword } from '../../services/user';
+import { createUser, deleteUser, listUsers, updateUserPassword, userLogin } from '../../services/user';
 import { User } from '../../types/userTypes';
-import { Auth } from '../../middlewares/auth'
+import { Auth } from '../../middlewares/auth';
+import jwt from 'jsonwebtoken';
 
 export const userRouter = Router();
 
@@ -27,7 +28,16 @@ userRouter.post('/userLogin', async (req, res) => {
         return res.status(400).json({message : 'sem informações'})
     }
 
-    return res.json({message : 'Login realizado com sucesso'})
+    const login = await userLogin(UserData)
+
+    if(login){
+        const token = jwt.sign(
+            { email: UserData.email },
+            process.env.JWT_SECRET as string
+        )
+
+        return res.json({message : 'Login realizado com sucesso'})
+    }
 })
 
 userRouter.get('/listUsers', Auth.private, async (req, res) => {
